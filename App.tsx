@@ -8,6 +8,7 @@
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  I18nManager,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -24,36 +25,55 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {FlatList, RectButton} from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+//  To toggle LTR/RTL change to `true`
+I18nManager.allowRTL(false);
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+const DATA = [
+  {
+    id: '1',
+    title: 'Running On Empty',
+    artist: 'Jackson Browne',
+  },
+  {
+    id: '2',
+    title: 'Running On Empty',
+    artist: 'Jackson Browne',
+  },
+  {
+    id: '3',
+    title: 'Running On Empty',
+    artist: 'Jackson Browne',
+  },
+  {
+    id: '4',
+    title: 'Running On Empty',
+    artist: 'Jackson Browne',
+  },
+];
+
+type DataRow = {
+  from: string;
+  when: string;
+  message: string;
+};
+
+const Row = ({item}: {item: DataRow}) => (
+  // eslint-disable-next-line no-alert
+  <RectButton style={styles.rectButton} onPress={() => window.alert(item.from)}>
+    <Text style={styles.fromText}>{item.from}</Text>
+    <Text numberOfLines={2} style={styles.messageText}>
+      {item.message}
+    </Text>
+    <Text style={styles.dateText}>{item.when} ❭</Text>
+  </RectButton>
+);
+
+const SwipeableRow = ({item, index}: {item: DataRow; index: number}) => {
+  // <Row />;
+};
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -68,30 +88,19 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <View
+        style={{
+          backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        }}>
+        <FlatList
+          data={DATA}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={({item, index}) => (
+            <SwipeableRow item={item} index={index} />
+          )}
+          keyExtractor={(_item, index) => `message ${index}`}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -113,6 +122,39 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+  rectButton: {
+    flex: 1,
+    height: 80,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    flexDirection: 'column',
+    backgroundColor: 'white',
+  },
+  separator: {
+    backgroundColor: 'rgb(200, 199, 204)',
+    height: StyleSheet.hairlineWidth,
+  },
+  fromText: {
+    fontWeight: 'bold',
+    backgroundColor: 'transparent',
+  },
+  messageText: {
+    color: '#999',
+    backgroundColor: 'transparent',
+  },
+  dateText: {
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    right: 20,
+    top: 10,
+    color: '#999',
+    fontWeight: 'bold',
+  },
 });
 
 export default App;
+
+// type SectionProps = PropsWithChildren<{
+//   title: string;
+// }>;
